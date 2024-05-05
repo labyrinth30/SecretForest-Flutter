@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class DefaultLayout extends StatelessWidget {
   final Widget body;
@@ -20,7 +19,7 @@ class DefaultLayout extends StatelessWidget {
       appBar: AppBar(
         title: const Center(
           child: Text(
-            'Secret Forest',
+            '비밀의숲 관리자 페이지',
           ),
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:secret_forest_flutter/utils/auth.dart';
+import 'package:secret_forest_flutter/models/auth.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, Auth>((ref) {
   return AuthNotifier();
