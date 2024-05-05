@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:secret_forest_flutter/screens/HomeScreen.dart';
-import 'package:secret_forest_flutter/screens/LoginScreen.dart';
+import 'package:secret_forest_flutter/screens/home_screen.dart';
+import 'package:secret_forest_flutter/screens/login_screen.dart';
 
 final router = GoRouter(
   routes: [

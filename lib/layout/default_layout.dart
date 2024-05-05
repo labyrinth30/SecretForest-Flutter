@@ -18,12 +18,9 @@ class DefaultLayout extends StatelessWidget {
         child: body,
       ),
       appBar: AppBar(
-        title: Center(
-          // GoRouter의 상태를 가져오는 방법
+        title: const Center(
           child: Text(
-            // 위젯트리로 올라가서 GoRouterState를 찾아서 가져옴
-            // uri는 현재 라우팅된 path를 가져옴
-            GoRouterState.of(context).uri.toString(),
+            'Secret Forest',
           ),
         ),
       ),
