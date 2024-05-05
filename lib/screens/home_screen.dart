@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:secret_forest_flutter/common/custom_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,9 +11,9 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Secret Forest'),
       ),
       body: Center(
-        child: CustomButton(
-          text: 'login',
-          onPressed: () => context.go('/login'),
+        child: ElevatedButton(
+          child: const Text('login'),
+          onPressed: () => context.pushReplacement('/login'),
         ),
       ),
     );

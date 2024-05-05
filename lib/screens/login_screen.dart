@@ -1,46 +1,52 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:secret_forest_flutter/components/my_button.dart';
 import 'package:secret_forest_flutter/components/my_textfield.dart';
+import 'package:secret_forest_flutter/riverpod/auth_store.dart';
 import 'package:secret_forest_flutter/services/auth_service.dart';
 import 'package:gap/gap.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({
     super.key,
   });
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  // text editing controllers
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
 
   // sign user in
-  void signUserIn() async {
-    // show loading circle
+  void signUserIn(
+    Dio dio,
+    WidgetRef ref,
+  ) async {
     showDialog(
       context: context,
       builder: (context) => const Center(
         child: CircularProgressIndicator(),
       ),
     );
-    // try sign in
     try {
-      await AuthService.signIn(
+      final response = await AuthService.signIn(
         emailController.text.trim(),
         passwordController.text.trim(),
+        dio,
       );
-      // pop the loading circle
+      ref.read(authProvider.notifier).updateUser(
+            accessToken: response.data['accessToken'],
+            email: response.data['email'],
+            id: response.data['id'],
+          );
       context.pop(context);
+      context.go('/main');
     } on Exception catch (_) {
-      // pop the loading circle
       context.pop(context);
-      // show error message
       showErrorMessage("Wrong Email or Password");
     }
   }
@@ -63,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final dio = Dio();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.grey[300],
@@ -82,7 +89,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 200,
                 ),
                 const Gap(50),
-                // welcome back, you've been missed!
                 Text(
                   "비밀의숲 관리자 페이지입니다.",
                   style: TextStyle(
@@ -110,7 +116,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   text: "Sign In",
                   // login button
                   onTap: () {
-                    signUserIn();
+                    signUserIn(
+                      dio,
+                      ref,
+                    );
                   },
                 ),
                 const Gap(50),

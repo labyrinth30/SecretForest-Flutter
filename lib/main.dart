@@ -13,7 +13,6 @@ void main() {
 }
 
 class MyApp extends ConsumerWidget {
-  // StatelessWidget 대신 ConsumerWidget 사용
   const MyApp({super.key});
 
   @override

@@ -1,11 +1,23 @@
 class Auth {
-  String? email;
-  String? accessToken;
-  String? id;
+  String email;
+  String accessToken;
+  int id;
 
   Auth({
-    this.email,
-    this.accessToken,
-    this.id,
+    required this.email,
+    required this.accessToken,
+    required this.id,
   });
+
+  Auth copyWith({
+    String? email,
+    int? id,
+    String? accessToken,
+  }) {
+    return Auth(
+      email: email ?? this.email,
+      id: id ?? this.id,
+      accessToken: accessToken ?? this.accessToken,
+    );
+  }
 }

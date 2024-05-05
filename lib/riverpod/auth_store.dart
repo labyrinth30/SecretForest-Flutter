@@ -8,6 +8,21 @@ final authProvider = StateNotifierProvider<AuthNotifier, Auth>((ref) {
 class AuthNotifier extends StateNotifier<Auth> {
   AuthNotifier()
       : super(
-          Auth(),
+          Auth(
+            email: '',
+            id: 0,
+            accessToken: '',
+          ),
         );
+  void updateUser({
+    String? email,
+    int? id,
+    String? accessToken,
+  }) {
+    state = state.copyWith(
+      email: email,
+      id: id,
+      accessToken: accessToken,
+    );
+  }
 }
