@@ -23,4 +23,19 @@ class AuthService {
       throw Exception('로그인 요청에 실패하였습니다.');
     }
   }
+
+  static Future<bool> checkUserIsLogin(Dio dio) async {
+    try {
+      final response = await dio.post(
+        'http://localhost:3001/auth/token/access',
+      );
+      if (response.statusCode == 201) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }
