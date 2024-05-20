@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:secret_forest_flutter/common/data.dart';
@@ -46,9 +47,9 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          const clientId = 'Ov23liPJFsSOqYa5vlBu';
-          const redirectUrl = 'http://localhost:3001/auth/github';
-          const url =
+          final clientId = dotenv.env['githubClientId'];
+          final redirectUrl = dotenv.env['githubRedirectUrl'];
+          final url =
               'https://github.com/login/oauth/authorize?client_id=$clientId&redirect_uri=$redirectUrl';
         },
       ),

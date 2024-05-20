@@ -7,6 +7,7 @@ import 'package:secret_forest_flutter/components/my_textfield.dart';
 import 'package:secret_forest_flutter/riverpod/auth_store.dart';
 import 'package:secret_forest_flutter/services/auth_service.dart';
 import 'package:gap/gap.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({
@@ -38,11 +39,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         passwordController.text.trim(),
         dio,
       );
-      ref.read(authProvider.notifier).updateUser(
-            accessToken: response.data['accessToken'],
-            email: response.data['email'],
-            id: response.data['id'],
-          );
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('accessToken', response.data['accessToken']);
       context.pop(context);
       context.go('/main');
     } on Exception catch (_) {
