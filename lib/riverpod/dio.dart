@@ -3,14 +3,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:secret_forest_flutter/common/data.dart';
 import 'package:secret_forest_flutter/models/auth.dart';
 import 'package:secret_forest_flutter/riverpod/auth_store.dart';
+import 'package:secret_forest_flutter/riverpod/shared_preferences_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-final dioProvider = Provider<Dio>((ref) {
+Future<String?> getAccessToken(Ref ref) async {
+  final prefs = await ref.read(sharedPreferencesProvider.future);
+  return prefs.getString('accessToken');
+}
+
+final dioProvider = FutureProvider<Dio>((ref) async {
   final dio = Dio();
 
-  final authState = ref.watch(authProvider);
+  final accessToken = await getAccessToken(ref);
+
   dio.interceptors.add(CustomInterceptor(
     ref: ref,
-    authState: authState,
+    accessToken: accessToken ?? '',
   ));
 
   return dio;
@@ -18,11 +26,11 @@ final dioProvider = Provider<Dio>((ref) {
 
 class CustomInterceptor extends Interceptor {
   final Ref ref;
-  final Auth authState;
+  final String accessToken;
 
   CustomInterceptor({
     required this.ref,
-    required this.authState,
+    required this.accessToken,
   });
 
   @override
@@ -35,9 +43,9 @@ class CustomInterceptor extends Interceptor {
     if (options.headers['accessToken'] == 'true') {
       options.headers.remove('accessToken');
 
-      final accessToken = authState.accessToken;
+      final localAccessToken = accessToken;
 
-      options.headers.addAll({'Authorization': 'Bearer $accessToken'});
+      options.headers.addAll({'Authorization': 'Bearer $localAccessToken'});
 
       return super.onRequest(options, handler);
     }
@@ -66,6 +74,7 @@ class CustomInterceptor extends Interceptor {
 
     final isStatus403 = err.response?.statusCode == 403;
     final isPathRefresh = err.requestOptions.path == 'auth/token/access';
+    final prefs = await SharedPreferences.getInstance();
 
     if (isStatus403 && !isPathRefresh) {
       final dio = Dio();
@@ -75,6 +84,8 @@ class CustomInterceptor extends Interceptor {
           '$authIp/auth/token/access',
         );
         final newAccessToken = response.data['accessToken'];
+        prefs.setString('accessToken', newAccessToken);
+
         final options = err.requestOptions;
 
         options.headers.addAll({

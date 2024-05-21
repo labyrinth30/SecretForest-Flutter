@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:secret_forest_flutter/components/my_button.dart';
 import 'package:secret_forest_flutter/components/my_textfield.dart';
-import 'package:secret_forest_flutter/riverpod/auth_store.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:secret_forest_flutter/services/auth_service.dart';
 import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +21,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final cj = CookieJar();
 
   // sign user in
   void signUserIn(
@@ -42,7 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('accessToken', response.data['accessToken']);
       context.pop(context);
-      context.go('/main');
+      context.pushReplacement('/main');
     } on Exception catch (_) {
       context.pop(context);
       showErrorMessage("Wrong Email or Password");

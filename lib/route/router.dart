@@ -9,7 +9,7 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) => const MainScreen(),
       routes: [
         GoRoute(
           path: 'main',
@@ -17,6 +17,10 @@ final router = GoRouter(
         ),
         GoRoute(
           path: 'auth',
+          builder: (context, state) => const AuthScreen(),
+        ),
+        GoRoute(
+          path: 'theme/:themeId',
           builder: (context, state) => const AuthScreen(),
         ),
       ],
