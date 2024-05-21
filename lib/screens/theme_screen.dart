@@ -7,14 +7,19 @@ import 'package:secret_forest_flutter/models/themes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeScreen extends ConsumerWidget {
-  const ThemeScreen({super.key});
+  final String themeId;
+
+  const ThemeScreen({
+    super.key,
+    required this.themeId,
+  });
 
   Future<Themes> getOneTheme(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
     final dio = Dio();
     final response = await dio.get(
-      'http://localhost:3000/themes/${GoRouterState.of(context).pathParameters['id']}',
+      'http://localhost:3000/themes/$themeId',
       options: Options(
         headers: {
           "Authorization": "Bearer $accessToken",
@@ -22,8 +27,8 @@ class ThemeScreen extends ConsumerWidget {
       ),
     );
     if (response.statusCode == 200) {
-      final Themes responseData = response.data;
-      final Themes themes = responseData;
+      final responseData = response.data;
+      final themes = Themes.fromJson(responseData);
       return themes;
     } else {
       throw Exception('Failed to load themes');
@@ -50,7 +55,14 @@ class ThemeScreen extends ConsumerWidget {
               return const Text('Error');
             } else {
               final themes = snapshot.data!;
-              return Text(themes.title);
+              return ListView(
+                children: [
+                  Text('Title: ${themes.title}'),
+                  Text('Description: ${themes.description}'),
+                  Text('난이도: ${themes.difficulty}'),
+                  Text('공포도: ${themes.fear}'),
+                ],
+              );
             }
           },
         ),
