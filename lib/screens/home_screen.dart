@@ -3,13 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:secret_forest_flutter/common/data.dart';
 import 'package:secret_forest_flutter/riverpod/auth_store.dart';
-import 'package:secret_forest_flutter/riverpod/dio.dart';
 import 'package:secret_forest_flutter/services/auth_service.dart';
 import 'dart:html';
-
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});

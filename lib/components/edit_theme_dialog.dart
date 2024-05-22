@@ -5,7 +5,8 @@ class EditThemeDialog extends StatefulWidget {
   final String initialDescription;
   final int initialFear;
   final int initialDifficulty;
-  final void Function(String, String, int, int) onSave;
+  final List<String> initialTimetable;
+  final void Function(String, String, int, int, List<String>) onSave;
 
   const EditThemeDialog({
     super.key,
@@ -13,6 +14,7 @@ class EditThemeDialog extends StatefulWidget {
     required this.initialDescription,
     required this.initialFear,
     required this.initialDifficulty,
+    required this.initialTimetable,
     required this.onSave,
   });
 
@@ -22,18 +24,25 @@ class EditThemeDialog extends StatefulWidget {
 
 class _EditThemeDialogState extends State<EditThemeDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _fearController = TextEditingController();
-  final _difficultyController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _fearController;
+  late TextEditingController _difficultyController;
+  late List<TextEditingController> _timetableControllers;
 
   @override
   void initState() {
     super.initState();
-    _titleController.text = widget.initialTitle;
-    _descriptionController.text = widget.initialDescription;
-    _fearController.text = widget.initialFear.toString();
-    _difficultyController.text = widget.initialDifficulty.toString();
+    _titleController = TextEditingController(text: widget.initialTitle);
+    _descriptionController =
+        TextEditingController(text: widget.initialDescription);
+    _fearController =
+        TextEditingController(text: widget.initialFear.toString());
+    _difficultyController =
+        TextEditingController(text: widget.initialDifficulty.toString());
+    _timetableControllers = widget.initialTimetable
+        .map((timetable) => TextEditingController(text: timetable))
+        .toList();
   }
 
   @override
@@ -42,6 +51,9 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
     _descriptionController.dispose();
     _fearController.dispose();
     _difficultyController.dispose();
+    for (var controller in _timetableControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -117,6 +129,66 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              const Text('시간표'),
+              const SizedBox(height: 8),
+              // Use Expanded to allow the ListView.builder to take up remaining space
+              Expanded(
+                // Wrap ListView.builder with Expanded to allow it to take up remaining space
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.initialTimetable.length,
+                  itemBuilder: (context, index) {
+                    final time = widget.initialTimetable[index];
+                    final controller = _timetableControllers[index];
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: controller,
+                            decoration: const InputDecoration(labelText: '시간'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '시간을 입력해주세요.';
+                              }
+                              // Validate time format (e.g., HH:MM)
+                              RegExp timeFormatRegExp =
+                                  RegExp(r'^[0-9]{2}:[0-9]{2}$');
+                              if (!timeFormatRegExp.hasMatch(value)) {
+                                return '시간 형식이 올바르지 않습니다. (HH:MM)';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Remove the time from the list
+                            setState(() {
+                              widget.initialTimetable.removeAt(index);
+                              _timetableControllers.removeAt(index);
+                            });
+                          },
+                          child: const Icon(Icons.delete),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Add a new time input field below the current one
+                            setState(() {
+                              widget.initialTimetable.insert(index + 1, '');
+                              _timetableControllers.insert(
+                                  index + 1, TextEditingController());
+                            });
+                          },
+                          child: const Icon(Icons.add),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
@@ -125,7 +197,11 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
                     final description = _descriptionController.text;
                     final fear = int.parse(_fearController.text);
                     final difficulty = int.parse(_difficultyController.text);
-                    widget.onSave(title, description, fear, difficulty);
+                    final timetable = _timetableControllers
+                        .map((controller) => controller.text)
+                        .toList();
+                    widget.onSave(
+                        title, description, fear, difficulty, timetable);
                     Navigator.pop(context);
                   }
                 },

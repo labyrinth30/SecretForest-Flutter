@@ -36,7 +36,7 @@ class ThemeScreen extends ConsumerWidget {
   }
 
   Future<Themes> updateTheme(String title, String description, int fear,
-      int difficulty, BuildContext context) async {
+      int difficulty, List<String> timetable, BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken') ?? '';
     final dio = Dio();
@@ -52,6 +52,7 @@ class ThemeScreen extends ConsumerWidget {
         'description': description,
         'fear': fear,
         'difficulty': difficulty,
+        'timetable': timetable,
       },
     );
     if (response.statusCode == 200) {
@@ -76,44 +77,68 @@ class ThemeScreen extends ConsumerWidget {
               return Text('Error: ${snapshot.error}');
             } else {
               final themes = snapshot.data!;
-              return Column(
-                children: [
-                  Text('Title: ${themes.title}'),
-                  Text('Description: ${themes.description}'),
-                  Text('난이도: ${themes.difficulty}'),
-                  Text('공포도: ${themes.fear}'),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Open a dialog for editing theme details
-                      showDialog(
-                        context: context,
-                        builder: (context) => EditThemeDialog(
-                          initialTitle: themes.title,
-                          initialDescription: themes.description,
-                          initialFear: themes.fear,
-                          initialDifficulty: themes.difficulty,
-                          onSave: (title, description, fear, difficulty) async {
-                            try {
-                              final updatedTheme = await updateTheme(title,
-                                  description, fear, difficulty, context);
-                              // Update UI with the updated theme details (optional)
-                              // Navigator.pop(context); // Close the dialog
-                              // ScaffoldMessenger.of(context)
-                              //   .showSnackBar(SnackBar(content: Text('Theme updated successfully!')));
-                            } on Exception catch (error) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text('Title: ${themes.title}'),
+                    Text('Description: ${themes.description}'),
+                    Text('난이도: ${themes.difficulty}'),
+                    Text('공포도: ${themes.fear}'),
+                    const Text('시간표:'),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount:
+                          themes.timetable.length ?? 0, // Handle null timetable
+                      itemBuilder: (context, index) {
+                        final time = themes.timetable[index];
+                        return ListTile(
+                          title: Text(time),
+                        );
+                      },
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => EditThemeDialog(
+                            initialTitle: themes.title,
+                            initialDescription: themes.description,
+                            initialFear: themes.fear,
+                            initialDifficulty: themes.difficulty,
+                            initialTimetable:
+                                themes.timetable ?? [], // Handle null timetable
+                            onSave: (title, description, fear, difficulty,
+                                timetable) async {
+                              try {
+                                final updatedTheme = await updateTheme(
+                                    title,
+                                    description,
+                                    fear,
+                                    difficulty,
+                                    timetable,
+                                    context);
+                                Navigator.pop(context); // Close the dialog
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Theme updated successfully!')));
+                              } on Exception catch (error) {
+                                ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Error updating theme: $error')));
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    child: const Text('수정'),
-                  ),
-                  // Rest of your ListView content...
-                ],
+                                    content:
+                                        Text('Error updating theme: $error'),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        );
+                      },
+                      child: const Text('수정'),
+                    ),
+                  ],
+                ),
               );
             }
           },
