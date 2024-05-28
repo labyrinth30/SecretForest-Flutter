@@ -22,6 +22,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final cj = CookieJar();
+  bool _isPasswordVisible = false;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isPasswordVisible = !_isPasswordVisible;
+    });
+  }
 
   // sign user in
   void signUserIn(
@@ -108,6 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,
+                  onTogglePasswordVisibility: _togglePasswordVisibility,
                 ),
                 const Gap(25),
                 // sign in button
