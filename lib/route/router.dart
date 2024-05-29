@@ -10,7 +10,7 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) => const MainScreen(),
       routes: [
         GoRoute(
           path: 'main',

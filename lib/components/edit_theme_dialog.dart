@@ -87,7 +87,6 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Fear input field
                   SizedBox(
                     width: 100,
                     child: TextFormField(
@@ -107,7 +106,6 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
                       },
                     ),
                   ),
-                  // Difficulty input field
                   SizedBox(
                     width: 100,
                     child: TextFormField(
@@ -132,16 +130,12 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
               const SizedBox(height: 16),
               const Text('시간표'),
               const SizedBox(height: 8),
-              // Use Expanded to allow the ListView.builder to take up remaining space
-              Expanded(
-                // Wrap ListView.builder with Expanded to allow it to take up remaining space
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: widget.initialTimetable.length,
-                  itemBuilder: (context, index) {
-                    final time = widget.initialTimetable[index];
-                    final controller = _timetableControllers[index];
-                    return Row(
+              Column(
+                children: List.generate(_timetableControllers.length, (index) {
+                  final controller = _timetableControllers[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
                       children: [
                         Expanded(
                           child: TextFormField(
@@ -151,7 +145,6 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
                               if (value == null || value.isEmpty) {
                                 return '시간을 입력해주세요.';
                               }
-                              // Validate time format (e.g., HH:MM)
                               RegExp timeFormatRegExp =
                                   RegExp(r'^[0-9]{2}:[0-9]{2}$');
                               if (!timeFormatRegExp.hasMatch(value)) {
@@ -164,9 +157,7 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
                         const SizedBox(width: 16),
                         ElevatedButton(
                           onPressed: () {
-                            // Remove the time from the list
                             setState(() {
-                              widget.initialTimetable.removeAt(index);
                               _timetableControllers.removeAt(index);
                             });
                           },
@@ -175,9 +166,7 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
                         const SizedBox(width: 8),
                         ElevatedButton(
                           onPressed: () {
-                            // Add a new time input field below the current one
                             setState(() {
-                              widget.initialTimetable.insert(index + 1, '');
                               _timetableControllers.insert(
                                   index + 1, TextEditingController());
                             });
@@ -185,9 +174,9 @@ class _EditThemeDialogState extends State<EditThemeDialog> {
                           child: const Icon(Icons.add),
                         ),
                       ],
-                    );
-                  },
-                ),
+                    ),
+                  );
+                }),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
