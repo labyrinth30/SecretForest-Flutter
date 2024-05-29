@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
 import 'package:secret_forest_flutter/components/edit_theme_dialog.dart';
 import 'package:secret_forest_flutter/layout/default_layout.dart';
 import 'package:secret_forest_flutter/models/themes.dart';
@@ -79,24 +80,27 @@ class ThemeScreen extends ConsumerWidget {
               final themes = snapshot.data!;
               return SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text('Title: ${themes.title}'),
                     Text('Description: ${themes.description}'),
                     Text('난이도: ${themes.difficulty}'),
                     Text('공포도: ${themes.fear}'),
+                    const Gap(8),
                     const Text('시간표:'),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount:
-                          themes.timetable.length ?? 0, // Handle null timetable
-                      itemBuilder: (context, index) {
-                        final time = themes.timetable[index];
-                        return ListTile(
-                          title: Text(time),
+                    const SizedBox(height: 8),
+                    // 중앙 정렬을 위해 Column으로 변경
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: themes.timetable.map((time) {
+                        return Center(
+                          child: ListTile(
+                            title: Text(time, textAlign: TextAlign.center),
+                          ),
                         );
-                      },
+                      }).toList(),
                     ),
+                    const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
                         showDialog(
@@ -106,8 +110,7 @@ class ThemeScreen extends ConsumerWidget {
                             initialDescription: themes.description,
                             initialFear: themes.fear,
                             initialDifficulty: themes.difficulty,
-                            initialTimetable:
-                                themes.timetable ?? [], // Handle null timetable
+                            initialTimetable: themes.timetable ?? [],
                             onSave: (title, description, fear, difficulty,
                                 timetable) async {
                               try {
